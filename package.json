@@ -1,5 +1,5 @@
 {
-  "name": "truffle-react-ts-template",
+  "name": "drug-supply-chain",
   "version": "1.0.0",
   "description": "supply-chain a medicine on blockchain",
   "keywords": [
@@ -8,16 +8,14 @@
     "dapp"
   ],
   "bugs": {
-    "url": "https://github.com/LibertyLocked/truffle-react-ts-template/issues"
+    "url": "https://github.com/spreadzp/drug-supply-ts/issues"
   },
   "author": "spread2009@gmail.com",
-  "contributors": [
-    "libertylocked"
-  ],
+  "contributors": [],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/libertylocked/truffle-react-ts-template.git"
+    "url": "https://github.com/spreadzp/drug-supply-ts.git"
   },
   "scripts": {
     "start": "npm run-script dev",
