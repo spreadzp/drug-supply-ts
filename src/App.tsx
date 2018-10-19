@@ -5,7 +5,8 @@ import getWeb3 from "./util/getWeb3";
 const appStyles = require("./App.css");
 const logo = require("./logo.svg");
 
-import MetaWallet from "./components/MetaWallet";
+import SupplyCore from "./components/SupplyCore";
+import SupplyForm from "./components/SupplyForm";
 
 interface IAppState {
   web3: Web3;
@@ -49,10 +50,10 @@ class App extends React.Component<{}, IAppState> {
             <p>Web3 is loading</p>}
         </div>
         <hr />
-        {this.state.web3 ? <MetaWallet web3={this.state.web3} /> : null}
+        {this.state.web3 ? <SupplyCore web3={this.state.web3} /> : null}
+        {this.state.web3 ? <SupplyForm web3={this.state.web3} /> : null}
       </div>
     );
   }
 }
-
 export default App;
