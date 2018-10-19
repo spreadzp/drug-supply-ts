@@ -10,35 +10,33 @@ interface ISupplyFormProps {
 }
 
 interface ISupplyFormState {
-    supplier: string;
-    accountError: boolean;
-    consumer: string;
-    contractAddress: string;
-    nameDrug: string;
-    countDrug: number;
-    partnersSupplier: string[];
+    name: string;
+    nameValid: boolean;
+    age: string;
+    ageValid: boolean;
 }
 
 export default class SupplyForm extends React.Component<ISupplyFormProps, ISupplyFormState> {
     constructor(props) {
         super(props);
+        // const name = props.name;
+        // const nameIsValid = this.validateName(name);
+        // const age = props.age;
+        // const ageIsValid = this.validateAge(age);
+        // this.state = {name: name, age: age, nameValid: nameIsValid, ageValid: ageIsValid};
+        this.onNameChange = this.onNameChange.bind(this);
+        this.onAgeChange = this.onAgeChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
         this.state = {
-            supplier: "",
-            accountError: false,
-            consumer: "",
-            contractAddress: "",
-            nameDrug: "",
-            countDrug: 0,
-            partnersSupplier: [],
+            name: "",
+            nameValid: false,
+            age: "",
+            ageValid: false,
         };
     }
 
     public async componentWillMount() {
         if (this.props.web3.eth.accounts.length === 0) {
-            this.setState({
-                supplier: "",
-                accountError: true,
-            });
             return;
         }
         SupplyCoreContract.setProvider(this.props.web3.currentProvider);
@@ -50,33 +48,63 @@ export default class SupplyForm extends React.Component<ISupplyFormProps, ISuppl
             return;
         }
         await instance.addSupplierPartners(this.props.web3.eth.accounts[1],
-             { gas: 8888888, from: this.props.web3.eth.accounts[0] });
+            { gas: 8888888, from: this.props.web3.eth.accounts[0] });
 
         await instance.addSupplierPartners(this.props.web3.eth.accounts[2],
-             { gas: 8888888, from: this.props.web3.eth.accounts[0] });
+            { gas: 8888888, from: this.props.web3.eth.accounts[0] });
 
-        const partners = await instance.getSupplierPartners();
-
-        this.setState({
-            supplier: this.props.web3.eth.accounts[0],
-            accountError: false,
-            consumer: this.props.web3.eth.accounts[3],
-            nameDrug: "ASPIRINE",
-            countDrug: 5,
-            partnersSupplier: partners,
-        });
+        // const partners = await instance.getSupplierPartners();
     }
 
+    public validateAge(age) {
+        return age >= 0;
+    }
+    public validateName(name) {
+        return name.length > 2;
+    }
+    public onAgeChange(e) {
+        const val = e.target.value;
+        const valid = this.validateAge(val);
+        this.setState({ age: val, ageValid: valid });
+    }
+    public onNameChange(e) {
+        const val = e.target.value;
+        console.log(val);
+        const valid = this.validateName(val);
+        this.setState({ name: val, nameValid: valid });
+    }
+
+    public handleSubmit(e) {
+        e.preventDefault();
+        if (this.state.nameValid === true && this.state.ageValid === true) {
+            alert("Имя: " + this.state.name + " Возраст: " + this.state.age);
+            this.setState({ age: "", ageValid: false, name: "", nameValid: false });
+        }
+    }
     public render() {
+        // цвет границы для поля для ввода имени
+        const nameColor = this.state.nameValid === true ? "green" : "red";
+        // цвет границы для поля для ввода возраста
+        const ageColor = this.state.ageValid === true ? "green" : "red";
         return (
-            <div>
-                <h3>Supply Form</h3>
-                <p>Supplier: {this.state.supplier}</p>
-                <p>consumer: {this.state.consumer}</p>
-                <p>nameDrug: {this.state.nameDrug}</p>
-                <p>countDrug: {this.state.countDrug}</p>
-                <p>partnersSupplier: {this.state.partnersSupplier}</p>
-            </div>
+            <form onSubmit={this.handleSubmit}>
+                <p>
+                    <label>Hash the drug:</label><br />
+                    <input type="text" value={this.state.name}
+                        onChange={this.onNameChange} style={{ borderColor: nameColor }} />
+                </p>
+                <p>
+                    <label>count of drugs:</label><br />
+                    <input type="number" value={this.state.age}
+                        onChange={this.onAgeChange} style={{ borderColor: ageColor }} />
+                </p>
+                <p>
+                    <label>numer days for the supply:</label><br />
+                    <input type="number" value={this.state.age}
+                        onChange={this.onAgeChange} style={{ borderColor: ageColor }} />
+                </p>
+                <input type="submit" value="Отправить" />
+            </form>
         );
     }
 }

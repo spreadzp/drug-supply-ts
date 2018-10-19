@@ -51,7 +51,7 @@ class App extends React.Component<{}, IAppState> {
         </div>
         <hr />
         {this.state.web3 ? <SupplyCore web3={this.state.web3} /> : null}
-        {this.state.web3 ? <SupplyForm web3={this.state.web3} /> : null}
+        {this.state.web3 ? <SupplyForm web3={this.state.web3}/> : null}
       </div>
     );
   }
