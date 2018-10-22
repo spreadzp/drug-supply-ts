@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as TruffleContract from "truffle-contract";
 import * as Web3 from "web3";
-import { Form, FormControl, ControlLabel, Button, FormGroup } from "react-bootstrap";
+import { Button, ControlLabel, Form, FormControl, FormGroup } from "react-bootstrap";
 
 const SupplyCoreContract = TruffleContract(require("../../build/contracts/SupplyCore.json"));
 import ISuppyCore from "../contract-interfaces/ISuppyCore";
@@ -13,15 +13,17 @@ interface ISupplyFormProps {
 interface ISupplyFormState {
     name: string;
     nameValid: boolean;
-    age: string;
-    ageValid: boolean;
+    count: number;
+    countValid: boolean;
     drug: string;
     hash: string;
+    price: number;
+    sumSupply: number;
 }
 
-const drugsForSupply = [{ name: "Aspirine", hash: "uyewiquyy376" },
-{ name: "Panadol", hash: "uyewdsfadasyy3ewr6" },
-{ name: "Remens", hash: "dasfdy3erw" }];
+const drugsForSupply = [{ name: "Aspirine", hash: "uyewiquyy376", price: 5 },
+{ name: "Panadol", hash: "uyewdsfadasyy3ewr6", price: 3 },
+{ name: "Remens", hash: "dasfdy3erw", price: 2 }];
 
 export default class SupplyForm extends React.Component<ISupplyFormProps, ISupplyFormState> {
 
@@ -33,16 +35,18 @@ export default class SupplyForm extends React.Component<ISupplyFormProps, ISuppl
         // const ageIsValid = this.validateAge(age);
         // this.state = {name: name, age: age, nameValid: nameIsValid, ageValid: ageIsValid};
         this.onNameChange = this.onNameChange.bind(this);
-        this.onAgeChange = this.onAgeChange.bind(this);
+        this.onCountChange = this.onCountChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onDrugChange = this.onDrugChange.bind(this);
         this.state = {
             name: "",
             nameValid: false,
-            age: "",
-            ageValid: false,
+            count: 0,
+            countValid: false,
             drug: "",
             hash: "",
+            price: 0,
+            sumSupply: 0,
         };
     }
 
@@ -67,23 +71,22 @@ export default class SupplyForm extends React.Component<ISupplyFormProps, ISuppl
         // const partners = await instance.getSupplierPartners();
     }
 
-    public validateAge(age) {
-        return age >= 0;
+    public validateAge(sum) {
+        return sum >= 0;
     }
     public validateName(name) {
         return name.length > 2;
     }
-    public onAgeChange(e) {
+    public onCountChange(e) {
         const val = e.target.value;
         const valid = this.validateAge(val);
-        this.setState({ age: val, ageValid: valid });
+        this.setState({ count: val, countValid: valid, sumSupply: this.state.price * val});
     }
 
     public onDrugChange(e) {
         const choiseDrug = e.target.value;
         if (choiseDrug) {
-            console.log('choiseDrug :', choiseDrug);
-            this.findHashOfDrug(choiseDrug);
+            this.setParametersOfDrug(choiseDrug);
             this.setState({ drug: choiseDrug });
         }
     }
@@ -97,15 +100,14 @@ export default class SupplyForm extends React.Component<ISupplyFormProps, ISuppl
 
     public handleSubmit(e) {
         e.preventDefault();
-        if (this.state.nameValid === true && this.state.ageValid === true) {
-            alert("DrugName: " + this.state.drug + "Имя: " + this.state.name + " Возраст: " + this.state.age);
-            this.setState({ age: "", ageValid: false, name: "", nameValid: false });
+        if (this.state.countValid === true) {
+            alert("DrugName: " + this.state.drug + "Имя: " + this.state.name + " Возраст: " + this.state.count);
+            this.setState({ count: 0, countValid: false, price: 0, name: "", nameValid: false, hash: "", sumSupply: 0 });
         }
     }
-    public findHashOfDrug(nameDrug: string) {
+    public setParametersOfDrug(nameDrug: string) {
         const choisenDrug = drugsForSupply.find(drug =>  drug.name === nameDrug);
-        console.log('choisenDrug.hash :', choisenDrug.hash);
-        this.setState({ hash: choisenDrug.hash });
+        this.setState({ hash: choisenDrug.hash, price: choisenDrug.price });
     }
 
     public render() {
@@ -119,37 +121,53 @@ export default class SupplyForm extends React.Component<ISupplyFormProps, ISuppl
         for (const drug of drugsForSupply) {
             options.push(<option value={drug.name}>{drug.name}</option>);
         }
-        const ageColor = this.state.ageValid === true ? "green" : "red";
+        const ageColor = this.state.countValid === true ? "green" : "red";
         return (
             <div className="gift-list">
                 <Form>
                     <FormGroup controlId="formControlsSelect">
-                        <ControlLabel>Select medicine for supply</ControlLabel>
+                        <ControlLabel>Select drug for supply</ControlLabel>
                         <FormControl componentClass="select" placeholder="select" onChange={this.onDrugChange} >
                             <option value="select" >select</option>
                             {options}
                         </FormControl>
                     </FormGroup>
                     <FormGroup>
-                        <ControlLabel>Medicine</ControlLabel>
+                        <ControlLabel>Hash drug</ControlLabel>
                         <FormControl
                             className="input-person"
                             type="text"
                             value={this.state.hash}
-                            onChange={this.onNameChange}
-                            style={{ borderColor: ageColor }}
                         />
 
                     </FormGroup>
                     <FormGroup>
-                        <ControlLabel>Count of the medicine</ControlLabel>
+                        <ControlLabel>Price drug</ControlLabel>
+                        <FormControl
+                            className="input-person"
+                            type="text"
+                            value={this.state.price}
+                        />
+
+                    </FormGroup>
+                    <FormGroup>
+                        <ControlLabel>Count</ControlLabel>
                         <FormControl
                             className="input-present"
                             type="number"
-                            value={this.state.age}
-                            onChange={this.onAgeChange}
+                            value={this.state.count}
+                            onChange={this.onCountChange}
                             style={{ borderColor: ageColor }}
                         />
+                    </FormGroup>
+                    <FormGroup>
+                        <ControlLabel>Sum of the order</ControlLabel>
+                        <FormControl
+                            className="input-person"
+                            type="text"
+                            value={this.state.sumSupply}
+                        />
+
                     </FormGroup>
                     <Button
                         className="btn-remove"

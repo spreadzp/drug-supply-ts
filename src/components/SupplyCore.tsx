@@ -2,6 +2,7 @@ import * as React from "react";
 import * as TruffleContract from "truffle-contract";
 import * as Web3 from "web3";
 
+
 const SupplyCoreContract = TruffleContract(require("../../build/contracts/SupplyCore.json"));
 import ISuppyCore from "../contract-interfaces/ISuppyCore";
 
@@ -17,6 +18,7 @@ interface ISupplyCoreState {
     nameDrug: string;
     countDrug: number;
     partnersSupplier: string[];
+    redirect: boolean;
 }
 
 export default class SupplyCore extends React.Component<ISupplyCoreProps, ISupplyCoreState> {
@@ -30,6 +32,7 @@ export default class SupplyCore extends React.Component<ISupplyCoreProps, ISuppl
             nameDrug: "",
             countDrug: 0,
             partnersSupplier: [],
+            redirect: false,
         };
     }
 
@@ -48,12 +51,12 @@ export default class SupplyCore extends React.Component<ISupplyCoreProps, ISuppl
         } catch (err) {
             alert(err);
             return;
-        } 
+        }
         await instance.addSupplierPartners(this.props.web3.eth.accounts[1],
-             { gas: 8888888, from: this.props.web3.eth.accounts[0] });
+            { gas: 8888888, from: this.props.web3.eth.accounts[0] });
 
         await instance.addSupplierPartners(this.props.web3.eth.accounts[2],
-             { gas: 8888888, from: this.props.web3.eth.accounts[0] });
+            { gas: 8888888, from: this.props.web3.eth.accounts[0] });
 
         const partners = await instance.getSupplierPartners();
 
