@@ -44,7 +44,7 @@ export default class SupplyCore extends React.Component<ISupplyCoreProps, ISuppl
         SupplyCoreContract.setProvider(this.props.web3.currentProvider);
         let instance: ISuppyCore;
         try {
-            instance = await SupplyCoreContract.deployed(); 
+            instance = await SupplyCoreContract.deployed();
         } catch (err) {
             alert(err);
             return;
