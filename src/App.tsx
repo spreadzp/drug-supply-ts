@@ -12,9 +12,10 @@ const appStyles = require("./App.css");
 const logo = require("./logo.svg");
 
 // import NotFound from "./components/NotFound";
+import ConfinrmForm from "./components/ConfirmForm";
+import NewDrug from "./components/NewDrug";
 import SupplyCore from "./components/SupplyCore";
 import SupplyForm from "./components/SupplyForm";
-import NewDrug from "./components/NewDrug";
 
 interface IAppState {
   web3: Web3;
@@ -38,7 +39,6 @@ class App extends React.Component<{}, IAppState> {
   public render() {
     return (
       <div>
-        
         <div className={appStyles.app}>
           <div className={appStyles.appHeader}>
             <img src={logo} className={appStyles.appLogo} alt="logo" />
@@ -63,7 +63,7 @@ class App extends React.Component<{}, IAppState> {
           {this.state.web3 ? <SupplyCore web3={this.state.web3} /> : null}
           {this.state.web3 ? <SupplyForm web3={this.state.web3} /> : null}
           {this.state.web3 ? <NewDrug web3={this.state.web3} /> : null}
-
+          {this.state.web3 ? <ConfinrmForm web3={this.state.web3} /> : null}
         </div>
       </div>
     );

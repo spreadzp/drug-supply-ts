@@ -84,6 +84,10 @@ contract SupplyCore {
         medicinesOfSupplier[msg.sender].push(hashMedicine);
         drugs[hashMedicine].push(newDrug);
     }
+
+    function getDrugsHashes(address supplier) public view returns (bytes32[]){
+        return medicinesOfSupplier[supplier];
+    }
     
     function getMedicines(bytes32 hashDrug) public view returns(string nameDrug,
         uint256 priceDrug, address supplier) {
@@ -100,8 +104,8 @@ contract SupplyCore {
         return suppliers;
     }
     
-    function getConsumerHashes(address _consumer) public view returns (bytes32[]){
-        return consumerHashes[_consumer];
+    function getConsumerHashes(address consumer) public view returns (bytes32[]){
+        return consumerHashes[consumer];
     }
     
     function checkSupplyFinish(bytes32 hash) public view returns (bool){
@@ -123,7 +127,7 @@ contract SupplyCore {
         return supplies[hash][0].paymentToSupplier;
     }
     
-    // add Math lib check count suppliers, comission
+    // add Math lib check count suppliers, comission 
     function createSupply (
         bytes32 hashDrug, uint256 countOfMedicine, uint256 intervalTimeSupply) public payable {
         uint256 sumOfConsumer = drugs[hashDrug][0].priceDrug * countOfMedicine;

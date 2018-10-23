@@ -2,7 +2,6 @@ import * as React from "react";
 import * as TruffleContract from "truffle-contract";
 import * as Web3 from "web3";
 
-
 const SupplyCoreContract = TruffleContract(require("../../build/contracts/SupplyCore.json"));
 import ISuppyCore from "../contract-interfaces/ISuppyCore";
 
@@ -16,9 +15,11 @@ interface ISupplyCoreState {
     consumer: string;
     contractAddress: string;
     nameDrug: string;
-    countDrug: number;
+    priceDrug: number;
     partnersSupplier: string[];
+    hashesDrug: string[];
     redirect: boolean;
+    consumerSupplyHashes: string[];
 }
 
 export default class SupplyCore extends React.Component<ISupplyCoreProps, ISupplyCoreState> {
@@ -30,9 +31,11 @@ export default class SupplyCore extends React.Component<ISupplyCoreProps, ISuppl
             consumer: "",
             contractAddress: "",
             nameDrug: "",
-            countDrug: 0,
+            priceDrug: 0,
             partnersSupplier: [],
+            hashesDrug: [],
             redirect: false,
+            consumerSupplyHashes: [],
         };
     }
 
@@ -57,16 +60,21 @@ export default class SupplyCore extends React.Component<ISupplyCoreProps, ISuppl
 
         await instance.addSupplierPartners(this.props.web3.eth.accounts[2],
             { gas: 8888888, from: this.props.web3.eth.accounts[0] });
+            const hashes = await instance.getConsumerHashes(this.props.web3.eth.accounts[3],
+                { gas: 8888888, from: this.props.web3.eth.accounts[0] });
+                console.log('hashes :', hashes);
+           this.setState({consumerSupplyHashes: hashes});
 
         const partners = await instance.getSupplierPartners();
-
+        const drugHashes = await instance.getDrugsHashes(this.props.web3.eth.accounts[0]);
         this.setState({
             supplier: this.props.web3.eth.accounts[0],
             accountError: false,
             consumer: this.props.web3.eth.accounts[3],
             nameDrug: "ASPIRINE",
-            countDrug: 5,
+            priceDrug: 5,
             partnersSupplier: partners,
+            hashesDrug: drugHashes,
         });
     }
 
@@ -76,9 +84,11 @@ export default class SupplyCore extends React.Component<ISupplyCoreProps, ISuppl
                 <h3>Supply</h3>
                 <p>Supplier: {this.state.supplier}</p>
                 <p>consumer: {this.state.consumer}</p>
+                <p>consumerSupplyHashes: {this.state.consumerSupplyHashes}</p>
                 <p>nameDrug: {this.state.nameDrug}</p>
-                <p>countDrug: {this.state.countDrug}</p>
+                <p>countDrug: {this.state.priceDrug}</p>
                 <p>partnersSupplier: {this.state.partnersSupplier}</p>
+                <p>hashesDrags: {this.state.hashesDrug}</p>
             </div>
         );
     }
