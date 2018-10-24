@@ -80,10 +80,10 @@ contract SupplyCore {
             priceDrug: price,
             supplier: msg.sender
         });
-        
-        medicinesOfSupplier[msg.sender].push(hashMedicine);
-        drugs[hashMedicine].push(newDrug);
+
         hashMedicine = keccak256(abi.encodePacked(name, price, msg.sender));
+        medicinesOfSupplier[msg.sender].push(hashMedicine);
+        drugs[hashMedicine].push(newDrug);        
         return hashMedicine;
     }
 
@@ -95,10 +95,6 @@ contract SupplyCore {
         uint256 priceDrug, address supplier) {
         return (drugs[hashDrug][0].nameDrug, drugs[hashDrug][0].priceDrug,
         drugs[hashDrug][0].supplier);
-    }
-
-    function getMedicinesSupplier(bytes32 hashDrug) public view returns(address supplier) {
-        return drugs[hashDrug][0].supplier;
     }
     
     function addSupplierPartners(address partner) public {
@@ -117,6 +113,10 @@ contract SupplyCore {
     function checkSupplyFinish(bytes32 hash) public view returns (bool){
         return supplies[hash][0].finishTimeOfSupply < now;
     }
+
+    function checkAllConsignSupply(bytes32 hash) public view returns (bool){
+        return supplies[hash][0].supplyFinish;
+    }
     
     function getSupply(bytes32 hash) public view returns (address _consumer,
         uint256 _payment,
@@ -132,22 +132,30 @@ contract SupplyCore {
     function checkPaymentToSupplier(bytes32 hash) public view returns (bool){
         return supplies[hash][0].paymentToSupplier;
     }
+
+    function checkSupplier(bytes32 hash) public view returns (address){
+        return supplies[hash][0].supplier;
+    }
     
     // add Math lib check count suppliers, comission 
     function createSupply (
         bytes32 hashDrug, uint256 countOfMedicine, uint256 intervalTimeSupply) public payable {
         uint256 sumOfConsumer = drugs[hashDrug][0].priceDrug * countOfMedicine;
-        require (msg.value >= sumOfConsumer, "consumer have not enough ethers for this supply");
+         /* require (msg.value >= sumOfConsumer, "consumer have not enough ethers for this supply"); */
         bytes32 newHashSupply = createHashSupply(countOfMedicine, intervalTimeSupply);
         consumerHashes[msg.sender].push(newHashSupply);
         uint256 endTimeOfSupply = now + intervalTimeSupply;
         Supply memory newSupply = Supply({
-            consumer: msg.sender, payment: msg.value,
+            consumer: msg.sender, // msg.value
+            payment: sumOfConsumer,
             nameOfMedicine: drugs[hashDrug][0].nameDrug,
             countOfMedicine: countOfMedicine,
-            finishTimeOfSupply: endTimeOfSupply, supplier: drugs[hashDrug][0].supplier,
-            supplyFinish: false, consignerGotDrug: false,
-            paymentToSupplier: false});
+            finishTimeOfSupply: endTimeOfSupply,
+            supplier: drugs[hashDrug][0].supplier,
+            supplyFinish: false,
+            consignerGotDrug: false,
+            paymentToSupplier: false
+        });
         supplies[newHashSupply].push(newSupply);
         emit NewSupply (msg.value, drugs[hashDrug][0].nameDrug, countOfMedicine, now, endTimeOfSupply);
     }

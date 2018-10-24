@@ -44,14 +44,28 @@ contract TestSupplyCore is SupplyCore {
         uint mask = 15;
         bytes memory bstr = new bytes(length);
         uint k = length - 1;
-        uint numStart = 48;
-        uint letterStarn = 65;
+       /*  uint numStart = 48;
+        uint letterStarn = 65; */
         while (i != 0){
             uint curr = (i & mask);
             bstr[k--] = curr > 9 ? byte(55 + curr ) : byte(48 + curr); // 55 = 65 - 10
             i = i >> 4;
         }
         return string(bstr);
+    }
+
+    function addressToString(address _addr) public pure returns(string) {
+        bytes32 value = bytes32(uint256(_addr));
+        bytes memory alphabet = "0123456789abcdef";
+
+        bytes memory str = new bytes(51);
+        str[0] = '0';
+        str[1] = 'x';
+        for (uint i = 0; i < 20; i++) {
+            str[2+i*2] = alphabet[uint(value[i + 12] >> 4)];
+            str[3+i*2] = alphabet[uint(value[i + 12] & 0x0f)];
+        }
+        return string(str);
     }
 
     function test_createHashSupply() public { 
@@ -68,25 +82,84 @@ contract TestSupplyCore is SupplyCore {
         Assert.equal(address(supplyCore), partners[0], "Address of partner not equal");
     }
 
-    function test_addDrug () public {
-        string memory drugName = "Aspirine";
-       
+    function test_createValidHashIn_addDrug () public {
+        string memory drugName = "Aspirine";       
         uint256 drugPrice = 3;
-        bytes32 hashMedicineFromContract = newSupplyCore.addDrug(drugName, drugPrice);
-        // string stringAddr = string(msg.sender); 
-        /* bytes32 memory hashtest = "eda84831b4151f6bd1a84f98c88cf3dd2554daf5590ab893acd9355fca3154be";
-        string memory converted = bytes32string(hashMedicineFromContract);
-        Assert.equal(hashtest, hashMedicineFromContract, converted); */
-      /*   bytes32 hashMedicine = keccak256(abi.encodePacked(drugName, drugPrice, msg.sender));
-        bytes32[] memory hashFromContractMedicine = newSupplyCore.getDrugsHashes(msg.sender); */
-        //address supplier= newSupplyCore.getMedicines(bytes32 hashDrug)(hashMedicineFromContract);
-        // Assert.equal(hashMedicineFromContract, hashMedicineFromContract, "Hash of supply not equal");
-        // Assert.equal(nameDrug, drugName, "Hash of supply not equal");
-       // Assert.equal(supplier, msg.sender, "Hash of supply not equal");
+        bytes32 hashSupply = newSupplyCore.addDrug(drugName, drugPrice);
+        
+        bytes32 testHash = keccak256(abi.encodePacked(drugName, drugPrice, address(this)));
+        Assert.equal(hashSupply, testHash, "hashes not equal");
     }
+
+    function test_checkDrugByHash () public {
+        string memory drugName = "Aspirine";       
+        uint256 drugPrice = 3;
+        bytes32 hashSupply = newSupplyCore.addDrug(drugName, drugPrice);
+        
+        (string memory nameDrug,  uint256 priceDrug, address supplier) = newSupplyCore.getMedicines(hashSupply);
+        Assert.equal(supplier, address(this), "addresses not equal");
+        Assert.equal(nameDrug, drugName, "names of drug not equal");
+        Assert.equal(priceDrug, drugPrice, "prices of drug not equal");
+    }
+
+   
+
+    function test_checkHashSupply () public {
+        string memory drugName = "Aspirine";       
+        uint256 drugPrice = 3;
+        uint256 drugCount = 2;
+        uint256 intervalSupply = 100000;
+        bytes32 hashDrug = newSupplyCore.addDrug(drugName, drugPrice);
+
+        newSupplyCore.createSupply(hashDrug, drugCount, intervalSupply);
+        bytes32 testHash = newSupplyCore.createHashSupply(drugCount, intervalSupply);
+        bytes32[] memory hashSupply = newSupplyCore.getConsumerHashes(address(this));
+        Assert.equal(hashSupply[0], testHash, "hashes not equal"); 
+    }
+
+    function test_checkSupplierByHash () public {
+        string memory drugName = "Aspirine";
+        uint256 drugPrice = 3;
+        uint256 drugCount = 2;
+        uint256 intervalSupply = 100000;
+        bytes32 hashDrug = newSupplyCore.addDrug(drugName, drugPrice);
+        newSupplyCore.createSupply(hashDrug, drugCount, intervalSupply);
+        bytes32[] memory hashSupply = newSupplyCore.getConsumerHashes(address(this));
+        address supplier = newSupplyCore.checkSupplier(hashSupply[0]);
+        Assert.equal(supplier, address(this), "addresses not equal"); 
+    }
+
+    function test_checkParametersDrug () public {
+        string memory drugName = "Aspirine";
+        uint256 drugPrice = 3;
+        uint256 drugCount = 2;
+        uint256 intervalSupply = 100000;
+        bytes32 hashDrug = newSupplyCore.addDrug(drugName, drugPrice);
+        newSupplyCore.createSupply(hashDrug, drugCount, intervalSupply);
+        bytes32[] memory hashSupply = newSupplyCore.getConsumerHashes(address(this)); 
+        (address _consumer, uint256 _payment, string memory _nameOfMedicine, uint256 countOfMedicine, uint256 _endSupplyTime) = newSupplyCore.getSupply(hashSupply[0]);
+        Assert.equal(_nameOfMedicine, drugName, "name the drug not equal");
+        Assert.equal(_consumer, address(this), "addresses not equal");
+        Assert.equal(countOfMedicine, drugCount, "count not equal");  
+        Assert.equal(_payment, drugPrice * drugCount, "payment not equal");
+    }
+
+   /*  function test_checkFinishCosignSupply () public {
+        string memory drugName = "Aspirine";
+        uint256 drugPrice = 3;
+        uint256 drugCount = 2;
+        uint256 intervalSupply = 100000;
+        newSupplyCore.addSupplierPartners(address(supplyCore));
+        bytes32 hashDrug = newSupplyCore.addDrug(drugName, drugPrice);
+        newSupplyCore.createSupply(hashDrug, drugCount, intervalSupply);
+        bytes32[] memory hashSupply = newSupplyCore.getConsumerHashes(address(this));
+        newSupplyCore.cosignSupply(hashSupply[0]);
+        bool finishCosing = newSupplyCore.checkAllConsignSupply(hashSupply[0]);
+        Assert.equal(finishCosing, true, "not all supply partner make cosign");
+    } */
 
     function test_checkNum () public {        
         string memory num5 = "5";
-        Assert.equal(uint2hexstr(6), num5, "num not equal");
+        Assert.equal(uint2hexstr(5), num5, "num not equal");
     }
 }
