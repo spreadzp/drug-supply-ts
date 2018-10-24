@@ -74,15 +74,17 @@ contract SupplyCore {
     }
     
     // add modifier supplier
-    function addDrug(string name, uint256 price) public {
+    function addDrug(string name, uint256 price) public returns (bytes32 hashMedicine) {
         Drug memory newDrug = Drug({
             nameDrug: name,
             priceDrug: price,
             supplier: msg.sender
         });
-        bytes32 hashMedicine = keccak256(abi.encodePacked(name,  price, msg.sender));
+        
         medicinesOfSupplier[msg.sender].push(hashMedicine);
         drugs[hashMedicine].push(newDrug);
+        hashMedicine = keccak256(abi.encodePacked(name, price, msg.sender));
+        return hashMedicine;
     }
 
     function getDrugsHashes(address supplier) public view returns (bytes32[]){
@@ -93,6 +95,10 @@ contract SupplyCore {
         uint256 priceDrug, address supplier) {
         return (drugs[hashDrug][0].nameDrug, drugs[hashDrug][0].priceDrug,
         drugs[hashDrug][0].supplier);
+    }
+
+    function getMedicinesSupplier(bytes32 hashDrug) public view returns(address supplier) {
+        return drugs[hashDrug][0].supplier;
     }
     
     function addSupplierPartners(address partner) public {
