@@ -21,6 +21,7 @@
     "start": "npm run-script dev",
     "build": "cross-env NODE_ENV=production webpack",
     "dev": "cross-env NODE_ENV=development webpack-dev-server",
+    "rpc": "testrpc --port 9545 --gasLimit 0xffffffffff ",
     "start-ganache": "ganache-cli --port 9545 --gasLimit 0xffffffffff ",
     "mr": "rm -rf ./build && truffle migrate --reset",
     "test": "jest --verbose --coverage",

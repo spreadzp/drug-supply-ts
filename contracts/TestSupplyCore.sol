@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "./../contracts/SupplyCore.sol";
+import "./contracts/SupplyCore.sol";
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 
@@ -13,13 +13,15 @@ contract TestSupplyCore is SupplyCore {
         supplyCore = SupplyCore(DeployedAddresses.SupplyCore());
     }
 
-    function char(byte b) internal  returns (byte c) {
-        if (b < 10) return byte(uint8(b) + 0x30);
-        else return byte(uint8(b) + 0x57);
+    function char(byte b) internal pure returns (byte c) {
+        if (b < 10) {
+            return byte(uint8(b) + 0x30);
+        } else {
+            return byte(uint8(b) + 0x57);
+        }
     }
 
-
-    function bytes32string(bytes32 b32) internal  returns (string out) {
+    function bytes32string(bytes32 b32) internal pure returns (string out) {
         bytes memory s = new bytes(64);
 
         for (uint i = 0; i < 32; i++) {
@@ -34,7 +36,9 @@ contract TestSupplyCore is SupplyCore {
     }
 
     function uint2hexstr(uint i) internal pure returns (string) {
-        if (i == 0) return "0";
+        if (i == 0) {
+            return "0";
+        }
         uint j = i;
         uint length;
         while (j != 0) {
@@ -46,7 +50,7 @@ contract TestSupplyCore is SupplyCore {
         uint k = length - 1;
        /*  uint numStart = 48;
         uint letterStarn = 65; */
-        while (i != 0){
+        while (i != 0) {
             uint curr = (i & mask);
             bstr[k--] = curr > 9 ? byte(55 + curr ) : byte(48 + curr); // 55 = 65 - 10
             i = i >> 4;
@@ -59,8 +63,8 @@ contract TestSupplyCore is SupplyCore {
         bytes memory alphabet = "0123456789abcdef";
 
         bytes memory str = new bytes(51);
-        str[0] = '0';
-        str[1] = 'x';
+        str[0] = "0";
+        str[1] = "x";
         for (uint i = 0; i < 20; i++) {
             str[2+i*2] = alphabet[uint(value[i + 12] >> 4)];
             str[3+i*2] = alphabet[uint(value[i + 12] & 0x0f)];
@@ -96,13 +100,12 @@ contract TestSupplyCore is SupplyCore {
         uint256 drugPrice = 3;
         bytes32 hashSupply = newSupplyCore.addDrug(drugName, drugPrice);
         
-        (string memory nameDrug,  uint256 priceDrug, address supplier) = newSupplyCore.getMedicines(hashSupply);
+        (string memory nameDrug,  uint256 priceDrug, address supplier) = 
+        newSupplyCore.getMedicines(hashSupply);
         Assert.equal(supplier, address(this), "addresses not equal");
         Assert.equal(nameDrug, drugName, "names of drug not equal");
         Assert.equal(priceDrug, drugPrice, "prices of drug not equal");
     }
-
-   
 
     function test_checkHashSupply () public {
         string memory drugName = "Aspirine";       
@@ -142,7 +145,16 @@ contract TestSupplyCore is SupplyCore {
         Assert.equal(_consumer, address(this), "addresses not equal");
         Assert.equal(countOfMedicine, drugCount, "count not equal");  
         Assert.equal(_payment, drugPrice * drugCount, "payment not equal");
+        Assert.equal(_endSupplyTime, _endSupplyTime, "_endSupplyTime not equal");
     }
+
+  /*   function test_payment () public {
+        // msg.value = 1 ether;
+        // uint256 sumPayment = 10 finney10 finney;
+        newSupplyCore.call.value(10 finney)();
+        uint256 sum = newSupplyCore.payment();
+        Assert.equal(sum, sum, "payment not equal");       
+    }  */
 
    /*  function test_checkFinishCosignSupply () public {
         string memory drugName = "Aspirine";

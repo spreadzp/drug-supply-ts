@@ -194,4 +194,9 @@ contract SupplyCore {
         emit NewHash(hash);
         return hash;
     }
+
+    /* function payment() public payable returns (uint256) {
+        require(sumPayment >= msg.value);
+        return sumPayment;  
+    }  */
 }
