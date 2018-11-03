@@ -4,7 +4,7 @@ import "./contracts/SupplyCore.sol";
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 
-contract TestSupplyCore is SupplyCore {
+contract test_SupplyCore is SupplyCore {
     SupplyCore newSupplyCore;
     SupplyCore supplyCore;
 
