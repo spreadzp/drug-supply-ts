@@ -22,7 +22,7 @@
     "build": "cross-env NODE_ENV=production webpack",
     "dev": "cross-env NODE_ENV=development webpack-dev-server",
     "rpc": "testrpc --port 9545 --gasLimit 0xffffffffff ",
-    "start-ganache": "ganache-cli --port 9545 --gasLimit 0xffffffffff ",
+    "start-ganache": "ganache-cli --port 9545 -l 8000000 --gas-limit 7984452 --gasPrice=100000000000",
     "mr": "rm -rf ./build && truffle migrate --reset",
     "test": "jest --verbose --coverage",
     "lint": "tslint -p tsconfig.json",
