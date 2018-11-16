@@ -1,7 +1,8 @@
 import * as React from "react";
+import { Button, ControlLabel, Form, FormControl, FormGroup } from "react-bootstrap";
 import * as TruffleContract from "truffle-contract";
 import * as Web3 from "web3";
-import { Button, ControlLabel, Form, FormControl, FormGroup } from "react-bootstrap";
+
 
 const SupplyCoreContract = TruffleContract(require("../../build/contracts/SupplyCore.json"));
 import ISuppyCore from "../contract-interfaces/ISuppyCore";
@@ -56,7 +57,6 @@ export default class ConfinrmForm extends React.Component<IConfinrmFormProps, IC
         const hashes = await instance.getConsumerHashes(this.props.web3.eth.accounts[3],
             { gas: 8888888, from: this.props.web3.eth.accounts[0] });
         const validHashes = await this.getValidHashSupply(hashes);
-        console.log('validHashes :', validHashes);
         this.setState({ supplyHashes: validHashes, supplierPartners: partners });
     }
 

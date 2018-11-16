@@ -60,10 +60,9 @@ export default class SupplyCore extends React.Component<ISupplyCoreProps, ISuppl
 
         await instance.addSupplierPartners(this.props.web3.eth.accounts[2],
             { gas: 8888888, from: this.props.web3.eth.accounts[0] });
-            const hashes = await instance.getConsumerHashes(this.props.web3.eth.accounts[3],
-                { gas: 8888888, from: this.props.web3.eth.accounts[0] });
-                console.log('hashes :', hashes);
-           this.setState({consumerSupplyHashes: hashes});
+        const hashes = await instance.getConsumerHashes(this.props.web3.eth.accounts[3],
+            { gas: 8888888, from: this.props.web3.eth.accounts[0] });
+        this.setState({ consumerSupplyHashes: hashes });
 
         const partners = await instance.getSupplierPartners();
         const drugHashes = await instance.getDrugsHashes(this.props.web3.eth.accounts[0]);

@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
  
-import "./SupplyCore.sol";
+import "./../contracts/SupplyCore.sol";
 
 
 contract TestSupplyCore is SupplyCore {

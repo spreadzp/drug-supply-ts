@@ -1,10 +1,9 @@
 import * as React from "react";
+import { Button, ControlLabel, Form, FormControl, FormGroup } from "react-bootstrap";
 import * as TruffleContract from "truffle-contract";
 import * as Web3 from "web3";
-import { Button, ControlLabel, Form, FormControl, FormGroup } from "react-bootstrap";
-
-const SupplyCoreContract = TruffleContract(require("../../build/contracts/SupplyCore.json"));
 import ISuppyCore from "../contract-interfaces/ISuppyCore";
+const SupplyCoreContract = TruffleContract(require("../../build/contracts/SupplyCore.json"));
 
 interface ISupplyFormProps {
     web3: Web3;
@@ -87,7 +86,6 @@ export default class SupplyForm extends React.Component<ISupplyFormProps, ISuppl
         this.setState({ drugHashes: await instance.getDrugsHashes(this.props.web3.eth.accounts[0]) });
         for (const currentHash of this.state.drugHashes) {
             const medicines = await instance.getMedicines(currentHash);
-            console.log('medicines :', medicines);
             drugsForSupply.push({ name: medicines[0], hash: currentHash, price: Number(medicines[1]) });
             this.setState({ countDrugs: +this.state.countDrugs });
         }
@@ -152,7 +150,9 @@ export default class SupplyForm extends React.Component<ISupplyFormProps, ISuppl
                 value: valEthToFunc,
                 // gasLimit: 21000, gasPrice: 20000000000,
             });
-            await this.setState({ count: 0, countValid: false, price: 0, name: "", nameValid: false, hash: "", sumSupply: 0 });
+            await this.setState({
+                count: 0, countValid: false, price: 0, name: "", nameValid: false, hash: "", sumSupply: 0,
+            });
             console.log(`_nameOfMedicine = ${supply.logs[1].args._nameOfMedicine}
             _sumTheMedicine = ${supply.logs[1].args._sumTheMedicine.toNumber()}
             _countOfMedicine = ${supply.logs[1].args._countOfMedicine.toNumber()}
@@ -169,13 +169,13 @@ export default class SupplyForm extends React.Component<ISupplyFormProps, ISuppl
         }).replace(/\./g, "/");
     }
     public setParametersOfDrug(nameDrug: string) {
-        const choisenDrug = drugsForSupply.find(drug => drug.name === nameDrug);
+        const choisenDrug = drugsForSupply.find((drug: any) => drug.name === nameDrug);
         this.setState({ hash: choisenDrug.hash, price: choisenDrug.price });
     }
     public componentDidUpdate() {
         // Access ISO String and formatted values from the DOM.
         const hiddenInputElement = document.getElementById("example-datepicker");
-        console.log(hiddenInputElement); // ISO String, ex: "2016-11-19T12:00:00.000Z" 
+        console.log(hiddenInputElement); // ISO String, ex: "2016-11-19T12:00:00.000Z"
     }
     public render() {
         const options = [];
